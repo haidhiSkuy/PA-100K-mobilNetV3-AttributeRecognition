@@ -45,7 +45,7 @@ class PersonAppereanceDataModule(L.LightningDataModule):
 
     def get_transform(self):
         transform = v2.Compose([
-            v2.Resize((128, 256)),
+            v2.Resize((256, 192)),
             v2.ToTensor(),
         ]) 
         return transform  
