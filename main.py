@@ -3,7 +3,7 @@ import wandb
 import lightning as L
 from scipy.io import loadmat
 from lightning.pytorch.loggers import WandbLogger
-from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from dataset.dataset import PersonAppereanceDataModule
 from model.person_appereance_model import PersonAppearanceLightning 
 
@@ -15,6 +15,9 @@ checkpoint = ModelCheckpoint(
     save_on_train_epoch_end=True,
     verbose=True, 
     save_weights_only=True
+)
+early_stopping = EarlyStopping(
+    monitor="val_loss", min_delta=0.5, patience=3, verbose=True
 )
 
 
@@ -48,6 +51,6 @@ valid_labels = [list(i) for i in valid_labels]
 # Training
 model = PersonAppearanceLightning(8)
 data = PersonAppereanceDataModule(train_images, train_labels, valid_images, valid_labels, 16)
-trainer = L.Trainer(max_epochs=20, logger=wandb_logger, callbacks=[checkpoint], accelerator="gpu", devices="auto")
+trainer = L.Trainer(max_epochs=20, logger=wandb_logger, callbacks=[checkpoint, early_stopping], accelerator="gpu", devices="auto")
 
 trainer.fit(model, data)
